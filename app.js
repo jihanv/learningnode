@@ -15,7 +15,7 @@ mongoose.connect(dbURI)
     .then(() => { app.listen(3000) })
     .catch((err) => { console.log("ERROR") })
 
-//middleware to give access to static files conveniently
+//middleware to give access to static files conveniently. Anything in the "public" folder can now be accessed
 app.use(express.static("public"))
 
 // middleware that logs information for you
@@ -41,6 +41,8 @@ app.get("/about", (req, res) => {
 
 
 //These are the blog routes
+
+//Gets the things from blogs collection from that database
 app.get("/blogs", (req, res)=>{
     Blog.find().sort({createdAt: -1})
     .then((result) => {
@@ -51,11 +53,22 @@ app.get("/blogs", (req, res)=>{
     })
 })
 
+//Find blog by id
+app.get("/single-blog", (req, res) => {
+    Blog.findById("6832fac69f813d0a6950f84f")
+    .then((result) => {
+        res.send(result)
+    })
+    .catch((err) => {
+        console.log(err)
+    })
+})
+
 app.get("/blogs/create", (req, res) => {
     res.render("create", { title: "Create a new blog" })
 })
 
 // page does not exist
-app.use((rew, res) => {
+app.use((req, res) => {
     res.status(404).render("404", { title: "404" })
 })
