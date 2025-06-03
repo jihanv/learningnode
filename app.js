@@ -1,0 +1,61 @@
+const express = require("express")
+const morgan = require("morgan")
+const mongoose = require("mongoose")
+const Blog = require("./models/blog")
+
+// express app
+const app = express()
+
+//register for view engine
+app.set("view engine", "ejs")
+
+//Connect to mongodb
+const dbURI = "mongodb+srv://jinja:osiduf0rw89usAS@nodetut.xxl2kuo.mongodb.net/node-tuts?retryWrites=true&w=majority&appName=nodetut"
+mongoose.connect(dbURI)
+    .then(() => { app.listen(3000) })
+    .catch((err) => { console.log("ERROR") })
+
+//middleware to give access to static files conveniently
+app.use(express.static("public"))
+
+// middleware that logs information for you
+app.use(morgan('dev'))
+
+app.use((req, res, next) => {
+    res.locals.path = req.path;
+    next();
+})
+
+app.get("/", (req, res) => {
+    res.redirect("/blogs")
+})
+
+app.get("/about", (req, res) => {
+    res.render("about", { title: "About" })
+})
+
+// app.use((req, res, next) => {
+//     console.log('in the next middleware');
+//     next();
+// })
+
+
+//These are the blog routes
+app.get("/blogs", (req, res)=>{
+    Blog.find().sort({createdAt: -1})
+    .then((result) => {
+        res.render("index", {title: "All Blogs", blogs: result})
+    })
+    .catch((err)=>{
+        console.log("Error!")
+    })
+})
+
+app.get("/blogs/create", (req, res) => {
+    res.render("create", { title: "Create a new blog" })
+})
+
+// page does not exist
+app.use((rew, res) => {
+    res.status(404).render("404", { title: "404" })
+})
