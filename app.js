@@ -43,7 +43,8 @@ app.get("/about", (req, res) => {
   res.render("about", { title: "About" });
 });
 
-app.use(blogRoutes)
+//Use the blogRoutes
+app.use("/blogs", blogRoutes)
 
 // page does not exist
 app.use((req, res) => {
